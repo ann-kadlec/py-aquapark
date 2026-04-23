@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Type
+from typing import Any
 
 
 class IntegerRange:
@@ -10,7 +10,7 @@ class IntegerRange:
     def __set_name__(self, owner: type["Visitor"], name: str) -> None:
         self.protected_name = "_" + name
 
-    def __get__(self, instance: "Visitor", owner: type["Visitor"]) ->  int:
+    def __get__(self, instance: "Visitor", owner: type["Visitor"]) -> int:
         if instance is None:
             return self
         return getattr(instance, self.protected_name)
@@ -24,11 +24,11 @@ class IntegerRange:
 
 
 class Visitor:
-   def __init__(self, name: str, age: int, weight: int, height: int) -> None:
-       self.name = name
-       self.age = age
-       self.weight = weight
-       self.height = height
+    def __init__(self, name: str, age: int, weight: int, height: int) -> None:
+        self.name = name
+        self.age = age
+        self.weight = weight
+        self.height = height
 
 
 class SlideLimitationValidator(ABC):
@@ -43,6 +43,7 @@ class ChildrenSlideLimitationValidator(SlideLimitationValidator):
     height = IntegerRange(80, 120)
     weight = IntegerRange(20, 50)
 
+
 class AdultSlideLimitationValidator(SlideLimitationValidator):
     age = IntegerRange(14, 60)
     height = IntegerRange(120, 220)
@@ -50,10 +51,17 @@ class AdultSlideLimitationValidator(SlideLimitationValidator):
 
 
 class Slide:
-    def __init__(self, name: str, limitation_class: Type[SlideLimitationValidator]  ) -> None:
+    def __init__(
+            self,
+            name: str,
+            limitation_class: "ChildrenSlideLimitationValidator "
+                              "| AdultSlideLimitationValidator") -> None:
         self.name = name
         self.limitation_class = limitation_class
 
     def can_access(self, visitor: "Visitor") -> bool:
-        self.limitation_class(visitor.age, visitor.weight, visitor.height):
-        return True
+        try:
+            self.limitation_class(visitor.age, visitor.weight, visitor.height)
+            return True
+        except (TypeError, ValueError):
+            return False
