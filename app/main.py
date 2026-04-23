@@ -15,7 +15,7 @@ class IntegerRange:
             return self
         return getattr(instance, self.protected_name)
 
-    def __set__(self, instance: "Visitor", value: Any):
+    def __set__(self, instance: "Visitor", value: Any) -> None:
         if not isinstance(value, int):
             raise TypeError
         if not self.min_amount <= value <= self.max_amount:
